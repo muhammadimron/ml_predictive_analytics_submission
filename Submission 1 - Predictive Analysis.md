@@ -1,5 +1,7 @@
 # Laporan Proyek Machine Learning - Muhammad Imron
-## Used Cars Price Prediction (Regression)
+
+## Domain Proyek
+### Used Cars Price Prediction (Regression)
 
 Industri mobil bekas merupakan industri yang terus meningkat beberapa tahun ini. Hal tersebut ditandai dengan munculnya berbagai portal mobil bekas online antara lain CarDheko, Quikr, Carwale dan Cars24 [1]. Keakuratan standar harga mobil bekas sangat penting bagi para pelaku dalam industri mobil bekas. Harga prediksi mobil yang akurat membutuhkan pakar ahli karena biasanya harga mobil ditentukan berdasarkan berbagai faktor. Beberapa faktor tersebut antara lain merek, model, usia, tipe bensin, tipe mesin, dan *mileage* [2]. Keefisienan dalam menentukan standar harga juga dibutuhkan oleh para pelaku industri demi mendapatkan profit maksimal dengan mengeluarkan biaya seminimum mungkin. Salah satu cara meningkatkan keefisienan dalam menentukan standar harga mobil bekas adalah melakukan automasisasi prediksi harga mobil seperti yang ditunjukkan oleh Venkatasubbu *et al* [1] dan Gegic *et al* [2]. Tujuan utama dari proyek ini adalah meneliti performa algoritma *machine learning* dalam mengatasi masalah automasisasi prediksi harga mobil bekas. Dataset yang digunakan dalam proyek ini adalah dataset yang dibuat oleh Aleksandr Glotov [3]. Dataset tersebut berisi data mengenai mobil bekas yang dikumpulkan dari berbagai situs penjualan online mobil bekas terkenal di Polandia.
 
@@ -42,71 +44,108 @@ Dataset yang digunakan dalam proyek ini adalah dataset yang diambil dari website
 Pada proyek ini, terdapat 4 langkah EDA yang dilakukan. Keempat langkah tersebut adalah sebagai berikut:
 1. **Deskripsi variabel**
 Pada langkah ini, dataset dijabarkan dengan menggunakan fungsi *info()* dan *describe()*. 
-![info_1.jpg](https://drive.google.com/uc?export=view&id=1mR6oSIjUMdQeK8jUU9RezqXj327gjKNp "Dataset Info")
-Gambar 1. Informasi dataset (awal).
-Berdasarkan gambar 1 diatas, dapat diambil informasi bahwa dataset memiliki 6 kolom bertipe *object* antara lain *mark*, *model*, *generation_name*, *fuel*, *city*, dan *province*. Sisa 5 kolom lain bertipe numerik yaitu *Unnamed: 0*, *year*, *mileage*, *vol_engine*, dan *price*.
-![describe_1.jpg](https://drive.google.com/uc?export=view&id=1goBxdYOouZb-OjMyxVceifO8OPbXcJc6 "Dataset Describe")
-Gambar 2. Informasi statistik kolom numerik (awal).
-Berdasarkan gambar 2 di atas, dapat diambil informasi bahwa kolom *Unnamed: 0*, *mileage*, dan *vol_engine* memiliki nilai minimal 0, hal tersebut tidak wajar dan akan ditangani pada tahap *data cleaning*.
+Tabel 1. Informasi dataset (awal).
+
+    |  # | Column          | Non Null Count  | Dtype  |
+    |:--:|-----------------|-----------------|--------|
+    | 0  | Unnamed: 0      | 117927 non-null | int64  |
+    | 1  | mark            | 117927 non-null | object |
+    | 2  | model           | 117927 non-null | object |
+    | 3  | generation_name | 87842 non-null  | object |
+    | 4  | year            | 117927 non-null | int64  |
+    | 5  | mileage         | 117927 non-null | int64  |
+    | 6  | vol_engine      | 117927 non-null | int64  |
+    | 7  | fuel            | 117927 non-null | object |
+    | 8  | city            | 117927 non-null | object |
+    | 9  | province        | 117927 non-null | object |
+    | 10 | price           | 117927 non-null | int64  |
+    Berdasarkan tabel 1 diatas, dapat diambil informasi bahwa dataset memiliki 6 kolom bertipe *object* antara lain *mark*, *model*, *generation_name*, *fuel*, *city*, dan *province*. Sisa 5 kolom lain bertipe numerik yaitu *Unnamed: 0*, *year*, *mileage*, *vol_engine*, dan *price*.
+    
+    Tabel 2. Informasi statistik kolom numerik (awal).
+
+    |   #   | Unnamed: 0    | year          | mileage      | vol_engine    | price        |
+    |:-----:|---------------|---------------|--------------|---------------|--------------|
+    | count | 117927.000000 | 117927.000000 | 1.179270e+05 | 117927.000000 | 1.179270e+05 |
+    | mean  | 58963.000000  | 2012.925259   | 1.409768e+05 | 1812.057782   | 7.029988e+04 |
+    | std   | 34042.736935  | 5.690135      | 9.236936e+04 | 643.613438    | 8.482458e+04 |
+    | min   | 0.000000      | 1945.000000   | 0.000000e+00 | 0.000000      | 5.000000e+02 |
+    | 25%   | 29481.500000  | 2009.000000   | 6.700000e+04 | 1461.000000   | 2.100000e+04 |
+    | 50%   | 58963.000000  | 2013.000000   | 1.462690e+05 | 1796.000000   | 4.190000e+04 |
+    | 75%   | 88444.500000  | 2018.000000   | 2.030000e+05 | 1995.000000   | 8.360000e+04 |
+    | max   | 117926.000000 | 2022.000000   | 2.800000e+06 | 7600.000000   | 2.399900e+06 |
+    Berdasarkan tabel 2 di atas, dapat diambil informasi bahwa kolom *Unnamed: 0*, *mileage*, dan *vol_engine* memiliki nilai minimal 0, hal tersebut tidak wajar dan akan ditangani pada tahap *data cleaning*.
 2. **_Data cleaning_**
 Pada tahap ini, dilakukan berbagai langkah untuk membersihkan data kotor pada dataset. Langkah-langkah tersebut adalah sebagai berikut.
-    - Langkah pertama adalah menghapus kolom *Unnamed: 0*, karena kolom tersebut hanyalah kolom kosong, jadi tidak diperlukan. Hasil dataset setelah kolom tersebut dihapus dapat dilihat pada gambar 3.
-    ![remove_unnamed.jpg](https://drive.google.com/uc?export=view&id=13Pfk3GM5y6hqM-D725HkwAtyLVdegwZf "remove unnamed")
-    Gambar 3. Dataset setelah *Unnamed: 0* dihapus.
-    ![generation_name_missing_value.jpg](https://drive.google.com/uc?export=view&id=1MFZxYVXVpmkpCp77ACwlAP2qkuFVbpKH "generation name missing value")
-    Gambar 4. Jumlah *missing value* setiap kolom
-    - Berdasarkan gambar 4, nilai *missing value* pada kolom *generation_name* sangat banyak, yaitu melebihi 25% dari total jumlah dataset. Daripada menangani *missing value* sebanyak itu hanya pada satu kolom, lebih baik kolom tersebut dihapus. Berdasarkan penjelasan tersebut, maka langkah selanjutnya adalah menghapus kolom *generation_name*.
-    - Seperti yang telah disebutkan dalam tahap deskripsi variabel, langkah selanjutnya adalah menangani nilai 0 pada kolom *mileage* dan *vol_engine*. 
-    ![mileage_size.jpg](https://drive.google.com/uc?export=view&id=1bg836HUwvxC28POgTqJYYaUn056UAAMt "mileage_size")
-    Gambar 5. Ukuran *mileage* yang mengandung nilai nol
-    ![vol_engine_size.jpg](https://drive.google.com/uc?export=view&id=1cqQk9pdlaAvkLa9L6tjdTE0WY1ELG6fE "vol_engine_size")
-    Gambar 6. Ukuran *vol_engine* yang mengandung nilai nol
-    Berdasarkan gambar 5 dan 6, dapat disimpulkan bahwa jumlah baris yang mengandung nilai 0 dari kolom *mileage* dan *vol_engine* sangat sedikit, yaitu sekitar 0,01% dari jumlah dataset sehingga cara yang tepat untuk mengatasi masalah tersebut adalah dengan cara menghapus baris yang mengandung nilai 0 dari kolom *mileage* dan *vol_engine*.
-    - Langkah selanjutnya adalah menghapus nilai duplikat pada dataset. Penghapusan nilai duplikat ini sangat penting agar saat pelatihan model memiliki data yang berbeda dan tidak akan menambah *weight* dari data yang sama. Proses menghapus data yang duplikat dapat dilakukan dengan memanggil fungsi *drop_duplicates()* seperti yang terlihat pada gambar 7. Parameter *inplace* yang digunakan pada fungsi tersebut akan membuat hasil *dataframe* dari fungsi memiliki indeks baru.
-    ![duplicate.jpg](https://drive.google.com/uc?export=view&id=1gAx-WPf_1BDbP3DVjte_-vU9V9LTs9Zu "duplicate")
-    Gambar 7. Proses penghapusan nilai duplikat.
-    - Langkah selanjutnya adalah menangani *outlier*. Pada proyek ini, metode yang digunakan untuk menangani outlier adalah *Inter Quartile Range* atau disingkat IQR. IQR bekerja dengan cara membuat batas bawah dan batas atas yang diambil dari nilai kuartil 1 dan 3 pada kolom target. Jika ada suatu nilai yang berada di luar batas bawah dan batas atas, maka nilai tersebut akan dikenal sebagai *outlier* oleh IQR dan akan dihapus. Proses IQR dapat dilihat pada gambar 8.
+    - Langkah pertama adalah menghapus kolom *Unnamed: 0*, karena kolom tersebut hanyalah kolom kosong, jadi tidak diperlukan. Hasil dataset setelah kolom tersebut dihapus dapat dilihat pada tabel 3.
+    Tabel 3. Dataset setelah *Unnamed: 0* dihapus.
+    
+        | # | mark | model | generation_name | year | mileage | vol_engine | fuel   | city     | province    | price |
+        |:-:|------|-------|-----------------|------|---------|------------|--------|----------|-------------|-------|
+        | 0 | opel | combo | gen-d-2011      | 2015 | 139568  | 1248       | Diesel | Janki    | Mazowieckie | 35900 |
+        | 1 | opel | combo | gen-d-2011      | 2018 | 31991   | 2499       | Diesel | Katowice | Slaskie     | 78501 |
+    - Nilai *missing value* pada kolom *generation_name* sangat banyak, yaitu melebihi 25% dari total jumlah dataset sebanyak 30085 baris. Daripada menangani *missing value* sebanyak itu hanya pada satu kolom, lebih baik kolom tersebut dihapus. Berdasarkan penjelasan tersebut, maka langkah selanjutnya adalah menghapus kolom *generation_name*.
+    - Seperti yang telah disebutkan dalam tahap deskripsi variabel, langkah selanjutnya adalah menangani nilai 0 pada kolom *mileage* dan *vol_engine*. Jumlah baris yang mengandung nilai 0 dari kolom *mileage* dan *vol_engine* sangat sedikit, yaitu sekitar 0,01% dari jumlah dataset (sebanyak 373 dan 1248 baris) sehingga cara yang tepat untuk mengatasi masalah tersebut adalah dengan cara menghapus baris yang mengandung nilai 0 dari kolom *mileage* dan *vol_engine*.
+    - Langkah selanjutnya adalah menghapus nilai duplikat pada dataset. Penghapusan nilai duplikat ini sangat penting agar saat pelatihan model memiliki data yang berbeda dan tidak akan menambah *weight* dari data yang sama. Proses menghapus data yang duplikat dapat dilakukan dengan memanggil fungsi *drop_duplicates()*. Setelah penghapusan nilai diplikat dalam dataset, sekarang dataset berukuran 110.090 baris dan 9 kolom.
+    - Langkah selanjutnya adalah menangani *outlier*. Pada proyek ini, metode yang digunakan untuk menangani outlier adalah *Inter Quartile Range* atau disingkat IQR. IQR bekerja dengan cara membuat batas bawah dan batas atas yang diambil dari nilai kuartil 1 dan 3 pada kolom target. Jika ada suatu nilai yang berada di luar batas bawah dan batas atas, maka nilai tersebut akan dikenal sebagai *outlier* oleh IQR dan akan dihapus. Proses IQR dapat dilihat pada gambar 1.
     ![outlier.jpg](https://drive.google.com/uc?export=view&id=1MFCXvJC7yErfi5fmOlgE-7gOM_Sx2C6j "outlier")
-    Gambar 8. Algoritma IQR.
-    Hasil dataset setelah penanganan *outlier* dapat dilihat pada gambar 9.
-    ![shape_after_outlier.jpg](https://drive.google.com/uc?export=view&id=17D7QnCNZfV3eBefeDz4sC_FE-06CDr3W "shape_after_outlier")
-    Gambar 9. *Shape* dataset setelah penanganan *outlier*.
-    - Langkah selanjutnya adalah mengubah tipe data kolom numerik selain kolom target, yaitu kolom *price*. Hal ini dilakukan untuk mempermudah proses perhitungan yang terjadi pada *data preprocessing*. Proses perubahan tipe data kolom numerik selain kolom *price* dapat dilihat pada gambar 10.
-    ![change_type.jpg](https://drive.google.com/uc?export=view&id=10-yOEpKjfc9MBHtmEmtM_Dxj3HijwNKS "change_type")
+    Gambar 1. Algoritma IQR.
+    Hasil dataset setelah penanganan *outlier* berukuran 94.393 baris dan 9 kolom.
+    - Langkah selanjutnya adalah mengubah tipe data kolom numerik selain kolom target, yaitu kolom *price*. Hal ini dilakukan untuk mempermudah proses perhitungan yang terjadi pada *data preprocessing*.
     Gambar 10. Perubahan tipe data pada kolom *year*, *mileage*, dan *vol_engine*.
-    - Langkah terakhir pada tahap *data cleaning* adalah mengecek kembali deskripsi variabel dataset. Pengecekan dilakukan sama seperti tahap deskripsi variabel, yaitu dengan cara memanggil fungsi *info()* dan *describe()*. Hasil pemanggilan fungsi tersebut dapat dilihat pada gambar 11 dan 12.
-    ![info_after_clean.jpg](https://drive.google.com/uc?export=view&id=1FS-tE4TGccR1wzYvAlSfIg5QCnr7v1Qq "info_after_clean")
-    Gambar 11. Info dataset setelah *data cleaning*.
-    ![describe_after_clean.jpg](https://drive.google.com/uc?export=view&id=1f1SnJEtn0iAhoBrkcsZSSn3fyPywhOWo "describe_after_clean")
-    Gambar 12. deskripsi statistik dataset setelah *data cleaning*.
-    Berdasarkan gambar 11 dan 12, maka dapat disimpulkan bahwa dataset sekarang sudah 'bersih' sehingga tahap selanjutnya adalah analisis pada setiap kolom yang ada dalam dataset, yaitu *univariate analysis*.
+    - Langkah terakhir pada tahap *data cleaning* adalah mengecek kembali deskripsi variabel dataset. Pengecekan dilakukan sama seperti tahap deskripsi variabel, yaitu dengan cara memanggil fungsi *info()* dan *describe()*. Hasil pemanggilan fungsi tersebut dapat dilihat pada tabel 3 dan 4.
+    Tabel 4. Info dataset setelah *data cleaning*.
+
+        | # | Column     | Non Null Count | Dtype   |
+        |:-:|------------|----------------|---------|
+        | 0 | mark       | 94393 non-null | object  |
+        | 1 | model      | 94393 non-null | object  |
+        | 2 | year       | 94393 non-null | float64 |
+        | 3 | mileage    | 94393 non-null | float64 |
+        | 4 | vol_engine | 94393 non-null | float64 |
+        | 5 | fuel       | 94393 non-null | object  |
+        | 6 | city       | 94393 non-null | object  |
+        | 7 | province   | 94393 non-null | object  |
+        | 8 | price      | 94393 non-null | int64   |
+        Tabel 5. Deskripsi statistik dataset setelah *data cleaning*.
+    
+        |   #   | year         | mileage       | vol_engine   | price         |
+        |:-----:|--------------|---------------|--------------|---------------|
+        | count | 94393.000000 | 94393.000000  | 94393.000000 | 94393.000000  |
+        | mean  | 2012.469622  | 148397.653777 | 1669.068925  | 47246.519498  |
+        | std   | 5.200417     | 82751.991794  | 344.170343   | 36130.114259  |
+        | min   | 1997.000000  | 1.000000      | 875.000000   | 500.000000    |
+        | 25%   | 2009.000000  | 87000.000000  | 1397.000000  | 19500.000000  |
+        | 50%   | 2013.000000  | 154000.000000 | 1598.000000  | 35999.000000  |
+        | 75%   | 2017.000000  | 204000.000000 | 1984.000000  | 65600.000000  |
+        | max   | 2022.000000  | 401315.000000 | 2796.000000  | 168200.000000 |
+        Berdasarkan tabel 4 dan 5, maka dapat disimpulkan bahwa dataset sekarang sudah 'bersih' sehingga tahap selanjutnya adalah analisis pada setiap kolom yang ada dalam dataset, yaitu *univariate analysis*.
 3. **_Univariate analysis_**
 Pada tahap ini, dilakukan analisis terhadap setiap kolom dalam dataset. Analisis dilakukan dengan membagi semua kolom ke dalam dua jenis, yaitu kolom kategori dan kolom numerik. Kolom kategori adalah kelompok kolom yang tipe datanya objek sedangkan kolom numerik adalah kelompok kolom yang tipe datanya numerik. Pertama adalah analisis pada kolom kategori. Hasil analisis kolom kategori adalah sebagai berikut.
     - Analisis pada kolom *mark*
     ![univariate_mark.jpg](https://drive.google.com/uc?export=view&id=1CdMe8VrwhCpANWB32xvzgWhHwpRu-j7i "univariate_mark")
-    Gambar 13. Visualisasi *count plot* kolom *mark*
-    Berdasarkan gambar 13, terdapat 23 kategori pada kolom *mark*, dengan jumlah terbanyak adalah kategori 'opel' dan jumlah paling sedikit adalah 'chevrolet'. Sekitar 20% lebih sampel berada pada kategori 'opel', 'volkswagen', dan 'ford'.
+    Gambar 2. Visualisasi *count plot* kolom *mark*
+    Berdasarkan gambar 2, terdapat 23 kategori pada kolom *mark*, dengan jumlah terbanyak adalah kategori 'opel' dan jumlah paling sedikit adalah 'chevrolet'. Sekitar 20% lebih sampel berada pada kategori 'opel', 'volkswagen', dan 'ford'.
     - Analisis pada kolom *model*
-    ![univariate_model.jpg](https://drive.google.com/uc?export=view&id=1WjPzIlMstZHvwQ-aI1hFEdAbpo1uQ2dC "univariate_model")
-    Gambar 14. Visualisasi *count plot* kolom *model*
-    Berdasarkan gambar 14, terdapat 290 kategori pada kolom *model* dengan jumlah terbanyak adalah kategori 'astra' dan paling sedikit adalah kategori 'f150'. Jumlah kategori pada kolom *model* terlalu banyak sehingga akan berakibat pada pelatihan model, sehingga kolom *model* dihapus.
+    ![univariate_model.jpg](https://drive.google.com/uc?export=view&id=1TPBKegncSJLL3oEqY1aGfPP4hDq0zvzF "univariate_model")
+    Gambar 3. Visualisasi *count plot* kolom *model*
+    Berdasarkan gambar 3, terdapat 290 kategori pada kolom *model* dengan jumlah terbanyak adalah kategori 'astra' dan paling sedikit adalah kategori 'f150'. Jumlah kategori pada kolom *model* terlalu banyak sehingga akan berakibat pada pelatihan model, sehingga kolom *model* dihapus.
     - Analisis pada kolom *fuel*
     ![univariate_fuel.jpg](https://drive.google.com/uc?export=view&id=1G7ppzqS4f7IR6esjSsbv30fwbtfepAQs "univariate_fuel")
-    Gambar 15. Visualisasi *count plot* kolom *fuel*
-    Berdasarkan gambar 15, terdapat 5 kategori pada kolom *fuel* dengan jumlah terbanyak adalah kategori 'Gasiline' dan paling sedikit adalah kategori 'Electric'. Dapat dilihat 90% lebih sampel merupakan kategori 'Gasoline' dan 'Diesel'.
+    Gambar 4. Visualisasi *count plot* kolom *fuel*
+    Berdasarkan gambar 4, terdapat 5 kategori pada kolom *fuel* dengan jumlah terbanyak adalah kategori 'Gasiline' dan paling sedikit adalah kategori 'Electric'. Dapat dilihat 90% lebih sampel merupakan kategori 'Gasoline' dan 'Diesel'.
     - Analisis pada kolom *city*
-    ![univariate_city.jpg](https://drive.google.com/uc?export=view&id=1uihOWBi7W36UrGfLCDILNfCLjJe1bb3A "univariate_city")
-    Gambar 16. Visualisasi *count plot* kolom *city*
-    Berdasarkan gambar 16, terdapat 4151 kategori dalam kolom *city* dengan jumlah terbanyak adalah kategori 'Warszawa' dan paling sedikit adalah kategori 'Bledzew'. Jumlah kategori pada kolom *city* terlalu banyak sehingga akan berakibat pada pelatihan model, sehingga kolom *city* dihapus.
+    ![univariate_city.jpg](https://drive.google.com/uc?export=view&id=1MFwFALieO6q5ybl78_HPnQivH-8JBr30 "univariate_city")
+    Gambar 5. Visualisasi *count plot* kolom *city*
+    Berdasarkan gambar 5, terdapat 4151 kategori dalam kolom *city* dengan jumlah terbanyak adalah kategori 'Warszawa' dan paling sedikit adalah kategori 'Bledzew'. Jumlah kategori pada kolom *city* terlalu banyak sehingga akan berakibat pada pelatihan model, sehingga kolom *city* dihapus.
     - Analisis pada kolom *province*
     ![univariate_province.jpg](https://drive.google.com/uc?export=view&id=1CdMe8VrwhCpANWB32xvzgWhHwpRu-j7i "univariate_province")
-    Gambar 17. Visualisasi *count plot* kolom *province*
-    Berdasarkan gambar 17, terdapat 23 kategori pada kolom *province* dengan jumlah sampel terbanyak berada pada kategori 'Mazowieckie' dan paling sedikit adalah kategori 'Northern-Westfalen'. Dapat dilihat 30% lebih sampel berasal dari kategori 'Mazowieckie', 'Slaskie', dan 'Wielkopolskie'.
+    Gambar 6. Visualisasi *count plot* kolom *province*
+    Berdasarkan gambar 6, terdapat 23 kategori pada kolom *province* dengan jumlah sampel terbanyak berada pada kategori 'Mazowieckie' dan paling sedikit adalah kategori 'Northern-Westfalen'. Dapat dilihat 30% lebih sampel berasal dari kategori 'Mazowieckie', 'Slaskie', dan 'Wielkopolskie'.
 
     Analisis pada kolom jenis kategori telah dilakukan. Kali ini adalah analisis terhadap kolom berjenis numerik.
     ![univariate_numeric.jpg](https://drive.google.com/uc?export=view&id=1R5S6Rg0osXAlne6xcqA11-Q0Z7eB52rs "univariate_numeric")
-    Gambar 18. Visualisasi histogram kolom berjenis numerik
-    Berdasarkan gambar 18, maka dapat disimpulkan beberapa hal berikut.
+    Gambar 7. Visualisasi histogram kolom berjenis numerik
+    Berdasarkan gambar 7, maka dapat disimpulkan beberapa hal berikut.
     - Pada rentang tahun produksi sekitar 1990-an hingga 2017, harga mobil bekas semakin naik naik dan semakin turun pada tahun produksi setelah 2017.
     - Harga mobil bekasi semakin naik hingga mobil berjarak tempuh 200.000 km dan semakin turun setelahnya.
     - Harga mobil bervariasi berdasarkan tipe mesin dan tidak dapat ditentukan polanya
@@ -120,58 +159,71 @@ Pada tahap ini, dilakukan analisis terhadap setiap kolom dalam dataset. Analisis
 4. **_Multivariate analysis_**
 Pada tahap ini, dianalisis hubungan dan korelasi setiap kolom terhadap kolom *price*. Sama seperti *univariate analysis*, pada tahap ini, analisis dilakukan dengan membagi semua kolom ke dalam dua jenis, yaitu kolom kategori dan kolom numerik. Kolom kategori adalah kelompok kolom yang tipe datanya objek sedangkan kolom numerik adalah kelompok kolom yang tipe datanya numerik. Pertama adalah analisis pada kolom kategori.
     ![mulitvariate_category.jpg](https://drive.google.com/uc?export=view&id=1AbeTuIdviJaI2LdRCkqh9nQ2W6knKAB9 "multivariate_category")
-    Gambar 19. Visualisasi *catplot* kolom berjenis kategori terhadap kolom *price*
-    Berdasarkan gambar 19, maka dapat diambil beberapa kesimpulan sebagai berikut.
+    Gambar 8. Visualisasi *catplot* kolom berjenis kategori terhadap kolom *price*
+    Berdasarkan gambar 8, maka dapat diambil beberapa kesimpulan sebagai berikut.
     - Pada kolom *mark*, harga mobil relatif bervariasi tergantung merek mobil, sehingga dapat disimpulkan bahwa kolom *mark* berpengaruh besar terhadap harga mobil.
     - Pada kolom *fuel*, harga mobil sangat tinggi pada dua kategori, yaitu *hybrid* dan *electric* sehingga dapat disimpulkan kolom *fuel* juga memiliki pengaruh besar terhadap *price*.
     - Pada kolom *province*, harga mobil cenderung tinggi pada beberapa kategori, sehingga dapat disimpulkan bahwa harga mobil dipengaruhi oleh kolom *province*.
     - Kesimpulan akhir, semua kolom berjenis kategori memiliki pengaruh besar terhadap kolom *price*.
     
     ![multivariate_numeric.jpg](https://drive.google.com/uc?export=view&id=1CRikPZkJwszmshQBBrWHdjUbAkYomKXQ "mulitvariate_numeric")
-    Gambar 20. Visualisasi *pairplot* kolom berjenis numerik
+    Gambar 9. Visualisasi *pairplot* kolom berjenis numerik
     ![heatmap_numeric.jpg](https://drive.google.com/uc?export=view&id=1qLk_QXjE5ZZxULqvTLlnYa0ucmKOIs0F "heatmap_numeric")
-    Gambar 21. Visualisasi *heatmap* kolom berjenis numerik
-    Berdasarkan gambar 20 dan 21, dapat disimpulkan bahwa hanya kolom *year* dan *mileage* yang memiliki cukup korelasi dengan kolom *price*, sehingga kolom *vol_engine* dihapus. *Multivariate analysis* telah selesai dilakukan yang berarti proses EDA juga telah selesai dilakukan. Setelah melalui proses EDA, hasil akhir dataset dapat dilihat pada gambar 22.
-    ![final_after_eda.jpg](https://drive.google.com/uc?export=view&id=1T66MMk8Z5nKowaPODLc4GZll-rltLuAv "final_after_eda")
-    Gambar 22. Hasil akhir dataset setelah EDA.
+    Gambar 10. Visualisasi *heatmap* kolom berjenis numerik
+    Berdasarkan gambar 9 dan 10, dapat disimpulkan bahwa hanya kolom *year* dan *mileage* yang memiliki cukup korelasi dengan kolom *price*, sehingga kolom *vol_engine* dihapus. *Multivariate analysis* telah selesai dilakukan yang berarti proses EDA juga telah selesai dilakukan. Setelah melalui proses EDA, hasil akhir dataset dapat dilihat pada tabel 8.
+
+    Tabel 8. Hasil akhir dataset setelah EDA.
+
+    | # | mark | year   | mileage  | fuel   | province    | price |
+    |:-:|------|--------|----------|--------|-------------|-------|
+    | 0 | opel | 2015.0 | 139568.0 | Diesel | Mazowieckie | 35900 |
+    | 1 | opel | 2018.0 | 31991.0  | Diesel | Slaskie     | 78501 |
+    | 2 | opel | 2015.0 | 278437.0 | Diesel | Opolskie    | 27000 |
+    | 3 | opel | 2016.0 | 47600.0  | Diesel | Opolskie    | 30800 |
+    | 4 | opel | 2014.0 | 103000.0 | CNG    | Slaskie     | 35900 |
 
 ## Data Preparations
 Pada tahap ini, terdapat tiga teknik yang digunakan dalam melakukan *data preparation*. Teknik-teknik tersebut adalah sebagai berikut.
 1. **_One Hot Encoding_**
-Teknik ini dilakukan untuk melakukan proses *encoding* pada kolom kategori seperti kolom *mark*, *fuel*, dan *province*. 
-![one_hot.jpg](https://drive.google.com/uc?export=view&id=1Lojtm_ofhsJFz8ReXRmKpQb6UVdn0UNE "one_hot")
-Gambar 23. Proses *one hot encoding*.
-Berikut penjelasan proses yang dilakukan pada gambar 23.
+Teknik ini dilakukan untuk melakukan proses *encoding* pada kolom kategori seperti kolom *mark*, *fuel*, dan *province*. Proses dalam pelabelan menggunakan teknik *one hot encoding* adalah sebagai berikut
     - Membuat label *one hot encoding* pada kolom *mark*, *fuel*, dan *province* dengan memanfaatkan fungsi *get_dummies()*.
     - Menghapus kolom *mark*, *fuel*, dan *province* karena sudah diberi label.
     - Terakhir, mengecek hasil pelabelan dengan memanggil fungsi *head()*. Hasil pelabelan dapat dilihat pada gambar 24.
-    ![hasil_one_hot.jpg](https://drive.google.com/uc?export=view&id=1Y7WGePTzncnu0T8YBG549a4FvNGKodSF "hasil_one_hot")
-    Gambar 24. Hasil *one hot encoding*.
+    Tabel 9. Hasil *one hot encoding*.
+
+        | # | year   | mileage  | price | mark_audi | mark_bmw | mark_chevrolet | ... |
+        |:-:|--------|----------|-------|-----------|----------|----------------|-----|
+        | 0 | 2015.0 | 139568.0 | 35900 | 0         | 0        | 0              | ... |
+        | 1 | 2018.0 | 31991.0  | 78501 | 0         | 0        | 0              | ... |
+        | 2 | 2015.0 | 278437.0 | 27000 | 0         | 0        | 0              | ... |
+        | 3 | 2016.0 | 47600.0  | 30800 | 0         | 0        | 0              | ... |
+        | 4 | 2014.0 | 103000.0 | 35900 | 0         | 0        | 0              | ... |
     
-    Berdasarkan gambar 24, terlihat terdapat kolom baru seperti *mark_audi*, *mark_bow*, dan *mark_chevrolet*. Kolom tersebut adalah hasil dari output dari fungsi *get_dummies()*. Nilai satu pada kolom tersebut berarti *True* dan nol berarti *False*.
+        Berdasarkan tabel 9, terlihat terdapat kolom baru seperti *mark_audi*, *mark_bmw*, dan *mark_chevrolet*. Kolom tersebut adalah hasil dari output dari fungsi *get_dummies()*. Nilai satu pada kolom tersebut berarti *True* dan nol berarti *False*.
 2. **_Train Test Split_**
-Teknik ini dilakukan untuk membagi dataset menjadi dua bagian, yaitu data latih dan data uji. data latih akan digunakan untuk melatih model sedangkan data uji akan digunakan untuk evaluasi model. Hal tersebut perlu diterapkan agar model yang telah dilatih dapat diuji menggunakan data yang belum pernah dianalisa oleh model.
-![split.jpg](https://drive.google.com/uc?export=view&id=16dF-asrT_FN264Osqg9Tgxg74S8fj48I "split")
-Gambar 25. Proses *train test split*.
-Berdasarkan gambar 25, langkah-langkah yang dilakukan dalam menerapkan teknik ini adalah sebagai berikut.
+Teknik ini dilakukan untuk membagi dataset menjadi dua bagian, yaitu data latih dan data uji. data latih akan digunakan untuk melatih model sedangkan data uji akan digunakan untuk evaluasi model. Hal tersebut perlu diterapkan agar model yang telah dilatih dapat diuji menggunakan data yang belum pernah dianalisa oleh model.angkah-langkah yang dilakukan dalam menerapkan teknik ini adalah sebagai berikut.
     - Membagi dataset terlebih dahulu menjadi data y sebagai data target dan data X sebagai data fitur.
     - Membagi y dan X menjadi data latih dan data uji dengan rasio 0.975 : 0.025. Rasio tersebut dilakukan mengingat jumlah dataset yang besar setelah *data cleaning* yaitu sekitar 90.000. Pembagian dataset dilakukan dengan memanfaatkan *library train_test_split*.
-    - Terakhir, mengecek masing-masing ukuran keseluruhan dataset, X, dan y untuk memastikan pembagian dataset berhasil diterapkan. Hasil *train test split* dapat dilihat pada gambar 26.
-    ![hasil_split.jpg](https://drive.google.com/uc?export=view&id=1QRgbQLhLKlraZUDRSbwGdDT_lDKIaypc "hasil_split")
-    Gambar 26. Hasil *train test split*.
-
-    Berdasarkan gambar 26, proses pembagian dataset menjadi data latih dan data uji telah berhasil dilakukan. Dari 94393 baris keseluruhan dataset setelah melalui tahap *data cleaning*, terdapat 92033 baris merupakan data latih dan 2360 baris merupakan data uji.
+    - Terakhir, mengecek masing-masing ukuran keseluruhan dataset, X, dan y untuk memastikan pembagian dataset berhasil diterapkan. Dari 94393 baris keseluruhan dataset setelah melalui tahap *data cleaning*, terdapat 92033 baris merupakan data latih dan 2360 baris merupakan data uji.
 3. **Standarisasi**
-Teknik ini dilakukan untuk menyamakan skala antara kolom *year* dan *mileage*.
-![standarisasi.jpg](https://drive.google.com/uc?export=view&id=1jaE9kwsjQMgOKDSFit1PS5a-8EHFLzPA "standarisasi")
-Gambar 27. Proses standarisasi.
-Berdasarkan gambar 27, langkah-langkah yang dilakukan dalam melakukan standarisasi adalah sebagai berikut.
+Teknik ini dilakukan untuk menyamakan skala antara kolom *year* dan *mileage*. Langkah-langkah yang dilakukan dalam melakukan standarisasi adalah sebagai berikut.
     - Menyamakan skala antara kolom *year* dan *mileage* dengan memanfaatkan *library StandardScaler*.
-    - Mengecek nilai *mean* dan standar deviasi untuk memastikan standarisasi berhasil diterapkan. Hasil pengecekan nilai *mean* dan standar deviasi dapat dilihat pada gambar 28.
-    ![hasil_standarisasi.jpg](https://drive.google.com/uc?export=view&id=1AS7EspWqDD6CHCP7aTTE52a1nGn1MJOp "hasil_standarisasi")
-    Gambar 28. Hasil standarisasi.
+    - Mengecek nilai *mean* dan standar deviasi untuk memastikan standarisasi berhasil diterapkan. Hasil pengecekan nilai *mean* dan standar deviasi dapat dilihat pada tabel 10.
+    
+        Tabel 10. Hasil standarisasi.
 
-    Berdasarkan gambar 28, maka dapat terlihat bahwa proses standarisasi kolom *year* dan *mileage* telah berhasil dilakukan. Hal tersebut ditunjukkan dengan nilai *mean* dan standar deviasi masing-masing adalah nol dan satu.
+        |   #   | year       | mileage    |
+        |:-----:|------------|------------|
+        | count | 92033.0000 | 92033.0000 |
+        | mean  | -0.0000    | 0.0000     |
+        | std   | 1.000      | 1.0000     |
+        | min   | -2.9747    | -1.7928    |
+        | 25%   | -0.6675    | -0.7415    |
+        | 50%   | 0.1016     | 0.0681     |
+        | 75%   | 0.8707     | 0.6722     |
+        | max   | 1.8320     | 3.0565     |
+
+        Berdasarkan tabel 10, maka dapat terlihat bahwa proses standarisasi kolom *year* dan *mileage* telah berhasil dilakukan. Hal tersebut ditunjukkan dengan nilai *mean* dan standar deviasi masing-masing adalah nol dan satu.
 
 ## Modelling
 Pada tahap ini, terdapat tiga algoritma *machine learning* yang digunakan dalam proyek ini. Ketiga algoritma *machine learning* tersebut adalah sebagai berikut.
@@ -197,19 +249,28 @@ MSE merupakan metriks evaluasi yang sering digunakan dalam masalah regresi. metr
 > MSE = $$1 \over N$$ $$\sum_{i=1}^{N}(y_i-ypred_i)^2$$
 
 ### Hasil Pelatihan Model
-Metriks performasi yang digunakan dalam proyek ini adalah MSE (Penjelasan MSE ada di atas). Evaluasi hasil pelatihan dimulai dengan melakukan standarisasi pada data uji. Hal tersebut dilakukan untuk menyamakan skala kolom numerik pada data uji. Setelah melakukan standarisasi pada data uji, kemudian model akan dievaluasi menggunakan MSE. Hasil evaluasi kemudian disimpan dalam tabel dan divisualisasikan seperti pada gambar 28 dan 29.
+Metriks performasi yang digunakan dalam proyek ini adalah MSE (Penjelasan MSE ada di atas). Evaluasi hasil pelatihan dimulai dengan melakukan standarisasi pada data uji. Hal tersebut dilakukan untuk menyamakan skala kolom numerik pada data uji. Setelah melakukan standarisasi pada data uji, kemudian model akan dievaluasi menggunakan MSE. Hasil evaluasi kemudian disimpan dalam tabel dan divisualisasikan seperti pada tabel 10 dan gambar 10.
 
-![mse_table.jpg](https://drive.google.com/uc?export=view&id=1GEhzmxJbpzSJmAuCl4kvVQsfjDBgOrzB "mse_table")
-Gambar 29. Tabel MSE hasil pelatihan model.
+Tabel 10. Tabel MSE hasil pelatihan model.
+
+|     #    | train         | test          |
+|:--------:|---------------|---------------|
+| KNN      | 234205.149348 | 257399.825601 |
+| RF       | 275190.638714 | 280240.814556 |
+| Boosting | 415770.739132 | 421141.019751 |
+
 ![mse_barplot.jpg](https://drive.google.com/uc?export=view&id=1DOCzT-cHhJHI6f1ovJ15dAhAfNmEsvbC "mse_barplot")
-Gambar 30. Visualisasi *barplot* MSE.
+Gambar 10. Visualisasi *barplot* MSE.
 
-Berdasarkan gambar 29 dan 30, dapat diambil kesimpulan, bahwa model yang memiliki nilai error paling sedikit adalah KNN, sedangkan *AdaBoost* merupakan model yang nilai error-nya paling besar. Berdasarkan gambar 29 dan 30 juga dapat disimpulkan bahwa nilai error pada data latih lebih kecil dibanding nilai error pada data uji.
+Berdasarkan tabel dan gambar 10, dapat diambil kesimpulan, bahwa model yang memiliki nilai error paling sedikit adalah KNN, sedangkan *AdaBoost* merupakan model yang nilai error-nya paling besar. Berdasarkan gambar 29 dan 30 juga dapat disimpulkan bahwa nilai error pada data latih lebih kecil dibanding nilai error pada data uji.
 
-![mse_barplot.jpg](https://drive.google.com/uc?export=view&id=1-PnpAMvLEqAMoLHFti2tJ5_31DlOwZO0 "mse_barplot")
-Gambar 31. Hasil prediksi model terhadap nilai sebenarnya.
+Tabel 11. Hasil prediksi model terhadap nilai sebenarnya.
 
-Berdasarkan gambar 31, dapat disimpulkan bahwa prediksi model KNN, prediksi model RF, dan prediksi model *AdaBoost* adalah $20073, $25660, dan $26287 dari $19900. Dari ketiga model, model yang memiliki nilai prediksi meleset sangat kecil adalah model KNN dan model yang memiliki nilai prediksi meleset sangat besar adalah *AdaBoost*. Hal tersebut sejalan dengan hasil error pada pelatihan model, yaitu nilai error paling kecil adalah nilai error model KNN dan nilai error paling besar adalah nilai error model *AdaBoost*.
+| y_true | prediksi_KNN | prediksi_RF | prediksi_Boosting |
+|:------:|--------------|-------------|-------------------|
+| 19900  | 20073.3      | 25660.5     | 26287.5           |
+
+Berdasarkan tabel 11, dapat disimpulkan bahwa prediksi model KNN, prediksi model RF, dan prediksi model *AdaBoost* adalah $20073, $25660, dan $26287 dari $19900. Dari ketiga model, model yang memiliki nilai prediksi meleset sangat kecil adalah model KNN dan model yang memiliki nilai prediksi meleset sangat besar adalah *AdaBoost*. Hal tersebut sejalan dengan hasil error pada pelatihan model, yaitu nilai error paling kecil adalah nilai error model KNN dan nilai error paling besar adalah nilai error model *AdaBoost*.
 
 ### Kesimpulan
 Berdasarkan proyek yang telah dilakukan, maka dapat disimpulkan beberapa hal berikut.
